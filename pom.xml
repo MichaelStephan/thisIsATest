@@ -27,8 +27,26 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>25</java.version>
+		<java.version>17</java.version>
+		<logback.version>1.5.18</logback.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<!-- Explicitly manage logback-core version to mitigate CVE-2023-6481 -->
+			<!-- CVE requires version 1.2.13, 1.3.14, 1.4.14 or higher -->
+			<!-- Using 1.5.18 from Spring Boot parent for stability -->
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
