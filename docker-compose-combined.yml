@@ -1,0 +1,13 @@
+version: '1.0'
+services:
+  payrollmngmt_app:
+    image: jgurbani/payrollmngmt:0.0.2
+    ports:
+        - "8080:8080" # Maps host port 8080 to container port 8080
+    
+  payroll_loadgen:
+    image: loadgen-payroll:v1
+    environment:
+      - BASE_URL=http://payrollmngmt_app:8080
+    depends_on:
+      - payrollmngmt_app  

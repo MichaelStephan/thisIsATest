@@ -1,0 +1,28 @@
+# Use a minimal base image that includes a shell environment.
+# 'alpine/curl' is a good, small image that already includes 'curl' and 'bash'.
+FROM alpine:latest
+
+# Install bash, curl, and sed (which is often included in a base install but good to ensure)
+# Bash is required by the script's shebang: #!/bin/bash
+RUN apk update && apk add --no-cache bash curl sed
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the shell script into the container
+# Assuming your script is named 'load_simulator.sh' in the local directory
+COPY load_simulator.sh /app/load_simulator.sh
+
+# Use sed to convert DOS/Windows (CRLF) line endings to Unix (LF)
+RUN sed -i 's/\r$//' load_simulator.sh
+
+# Give execution permission to the script
+RUN chmod +x /app/load_simulator.sh
+
+# The script takes the BASE_URL from the environment, but it's hardcoded to localhost:8080.
+# If you want to hit a service running on the Docker host, you need to use host.docker.internal
+# or configure the network. We'll stick to the script's hardcoded value for now.
+
+# By default, run the load simulation script.
+# We use 'bash' to ensure the script's features, like background jobs and traps, work correctly.
+CMD ["bash", "load_simulator.sh"]

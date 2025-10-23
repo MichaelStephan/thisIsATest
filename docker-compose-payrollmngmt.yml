@@ -1,0 +1,8 @@
+version: '1.0'
+services:
+  payrollmngmt_app:
+    image: jgurbani/payrollmngmt:0.0.2
+    ports:
+        - "8080:8080" # Maps host port 8080 to container port 8080
+    
+    

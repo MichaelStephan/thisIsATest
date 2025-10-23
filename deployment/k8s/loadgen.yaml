@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen-deployment
+  namespace: payrollmngmt
+  labels:
+    app: loadgen-app
+spec:
+  # The load generator typically runs as a single instance (1 replica)
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: loadgen-app
+  template:
+    metadata:
+      labels:
+        app: loadgen-app
+    spec:
+      containers:
+      - name: loadgen-container
+        # NOTE: This image must be pushed to ACR (e.g., youracrname.azurecr.io/travel-loadgen:latest)
+        image: jgurbani/loadgen-payroll:v1
+        # The line below has been REMOVED from the container spec!
+        # restartPolicy: Always  <-- REMOVED
+        env:
+        - name: BASE_URL
+          # Correctly points to the internal Kubernetes Service name!
+          value: http://payrollmngmt-service:80
