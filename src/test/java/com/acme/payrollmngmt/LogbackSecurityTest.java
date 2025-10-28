@@ -37,6 +37,6 @@ class LogbackSecurityTest {
         assertNotNull(context, "Logback context should be available");
         
         // Verify logback is properly initialized
-        assertFalse(context.isStarted() == false, "Logback should be started");
+        assertTrue(context.isStarted(), "Logback should be started");
     }
 }
