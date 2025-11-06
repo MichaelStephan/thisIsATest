@@ -14,7 +14,7 @@
 
 This application has been secured against CVE-2023-6481 (Uncontrolled Resource Consumption in logback-core):
 
-- **Current Version:** logback-core 1.5.18 (safe version, vulnerability affects < 1.2.13, < 1.3.14, < 1.4.14)
+- **Current Version:** logback-core 1.5.18 (safe version, vulnerability affects 1.2.0-1.2.12, 1.3.0-1.3.13, 1.4.0-1.4.13)
 - **Remediation Actions:**
   1. Explicitly set `logback.version` property to 1.5.18 in pom.xml
   2. Verified that logback-receiver component is not included in dependencies
