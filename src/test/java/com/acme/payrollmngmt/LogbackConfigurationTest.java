@@ -81,7 +81,8 @@ class LogbackConfigurationTest {
             // Verify no dangerous appender types are present
             assertFalse(appenderClass.contains("ServerSocketAppender"), 
                 "ServerSocketAppender should not be configured (CVE-2023-6481)");
-            assertFalse(appenderClass.contains("SocketAppender") && !appenderClass.contains("Console"), 
+            // Explicitly check for any SocketAppender (excluding ConsoleAppender which is safe)
+            assertFalse(appenderClass.contains("SocketAppender") && !appenderClass.equals("ch.qos.logback.core.ConsoleAppender"), 
                 "SocketAppender should not be configured (CVE-2023-6481)");
             
             // Log the appender type for verification
@@ -93,16 +94,23 @@ class LogbackConfigurationTest {
 
     /**
      * Verify that the application logger is properly configured and can log messages.
+     * Note: The application uses both Log4j (via LogManager) and SLF4J (via Logback).
+     * This test verifies the SLF4J/Logback configuration which is the focus of CVE-2023-6481.
      */
     @Test
     void testApplicationLoggerWorks() {
-        org.slf4j.Logger logger = LoggerFactory.getLogger(PayrollmngmtApplication.class);
-        assertNotNull(logger, "Application logger should not be null");
+        // Test SLF4J logger (which uses Logback as the implementation)
+        org.slf4j.Logger slf4jLogger = LoggerFactory.getLogger(PayrollmngmtApplication.class);
+        assertNotNull(slf4jLogger, "SLF4J logger should not be null");
         
         // This should not throw an exception
         assertDoesNotThrow(() -> {
-            logger.info("Test log message for CVE-2023-6481 verification");
-        }, "Logging should work without errors");
+            slf4jLogger.info("Test SLF4J log message for CVE-2023-6481 verification");
+        }, "SLF4J logging should work without errors");
+        
+        // Verify that the logger is backed by Logback
+        assertTrue(slf4jLogger instanceof ch.qos.logback.classic.Logger,
+            "Logger should be a Logback logger implementation");
     }
 
     /**
@@ -128,12 +136,30 @@ class LogbackConfigurationTest {
         System.out.println("Logback version: " + version);
         
         // Parse version to check it's safe
+        // Handle versions like "1.5.18", "1.5.18-SNAPSHOT", "1.5.18-RC1", etc.
         String[] parts = version.split("\\.");
         assertTrue(parts.length >= 2, "Version should have at least major.minor components");
         
         int major = Integer.parseInt(parts[0]);
         int minor = Integer.parseInt(parts[1]);
-        int patch = parts.length > 2 ? Integer.parseInt(parts[2].split("-")[0]) : 0;
+        
+        // Extract patch version, handling suffixes like "-SNAPSHOT", "-RC1", etc.
+        int patch = 0;
+        if (parts.length > 2) {
+            String patchPart = parts[2];
+            // Extract numeric part before any non-numeric character
+            StringBuilder numericPart = new StringBuilder();
+            for (char c : patchPart.toCharArray()) {
+                if (Character.isDigit(c)) {
+                    numericPart.append(c);
+                } else {
+                    break;
+                }
+            }
+            if (numericPart.length() > 0) {
+                patch = Integer.parseInt(numericPart.toString());
+            }
+        }
         
         // Check against safe versions for CVE-2023-6481
         boolean isSafe = false;
