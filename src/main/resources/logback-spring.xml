@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 
+        Security Configuration for CVE-2023-6481 Remediation
+        
+        This configuration ensures that:
+        1. logback-receiver components are NOT enabled (they are disabled by default)
+        2. Only secure appenders are used
+        3. No network-based receivers that could be exploited
+        
+        CVE-2023-6481 affects the logback-receiver component which can cause resource 
+        exhaustion. This application does not use logback-receiver components.
+    -->
+    
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    
+    <!-- Application logging configuration -->
+    <logger name="com.acme.payrollmngmt" level="INFO"/>
+    
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
