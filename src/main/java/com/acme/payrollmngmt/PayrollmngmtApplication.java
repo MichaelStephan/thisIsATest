@@ -10,9 +10,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import javax.persistence.EntityManager;
 
 @SpringBootApplication
 @RestController
@@ -21,11 +24,14 @@ public class PayrollmngmtApplication {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
     private EmployeeRepository employeeRepository;
 
     public static void main(String[] args) {
         LOGGER.info("this uses a vulnerable log4j version");
-        //LOGGER.info("Starting Payroll Management System Application");
+        // LOGGER.info("Starting Payroll Management System Application");
         SpringApplication.run(PayrollmngmtApplication.class, args);
     }
 
@@ -33,6 +39,13 @@ public class PayrollmngmtApplication {
     public String home() {
         LOGGER.info("Accessed home endpoint");
         return "Welcome to Payroll Management System";
+    }
+
+    @GetMapping("/employee/{employeename}")
+    public String getEmployeeByName(@PathVariable String employeename) {
+        LOGGER.info("Searching for employee with name: {}", employeename);
+        entityManager.createQuery("SELECT e from Employee e where e.name = '" + employeename + "'").getResultList();
+        return "Searched for employee: " + employeename;
     }
 
     @GetMapping("/employees")
@@ -58,7 +71,7 @@ public class PayrollmngmtApplication {
             repository.save(new Employee("Merry Brandybuck", "burglar"));
             repository.save(new Employee("Tom Bombadil", "burglar"));
             repository.save(new Employee("Pippy Longstocking", "ring wearer"));
-            repository.save(new Employee("Jim Bombardier", "buddy"));               
+            repository.save(new Employee("Jim Bombardier", "buddy"));
             LOGGER.info("Loaded sample employees into H2 database.");
         };
     }
@@ -81,7 +94,7 @@ public class PayrollmngmtApplication {
     public ResponseEntity<String> simulateHttp500Error() {
         LOGGER.error("Simulating an HTTP 500 Internal Server Error!");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body("Simulated Internal Server Error: Could not process your request.");
+                .body("Simulated Internal Server Error: Could not process your request.");
     }
 
     /**
