@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payrollmngmt
+  namespace: payrollmngmt  
+  labels:
+    app: payrollmngmt
+spec:    
+  replicas: 2 # You likely want more than one instance for a production app
+  selector:
+    matchLabels:
+      app: payrollmngmt
+  template:
+    metadata:
+      labels:
+        app: payrollmngmt
+    spec:
+      containers:
+      - name: payrollmngmt
+        # NOTE: This image must be pushed to an Azure Container Registry (ACR)
+        image: jgurbani/payrollmngmt:0.0.2
+        ports:
+        - containerPort: 8080        
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payrollmngmt-service
+  namespace: payrollmngmt # This name will be the internal DNS hostname
+spec:
+  selector:
+    app: payrollmngmt
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer # Exposes the service externally via an Azure Load Balancer

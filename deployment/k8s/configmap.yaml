@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: payrollmngmt-config
-  namespace: payrollmngmt
-data:
-  SPRING_APPLICATION_NAME: payrollmngmt
-  # Add other configuration properties as needed
