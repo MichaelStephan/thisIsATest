@@ -43,8 +43,12 @@ public class PayrollmngmtApplication {
 
     @GetMapping("/employee/{employeename}")
     public String getEmployeeByName(@PathVariable String employeename) {
+        // http://localhost:8080/employee/';%20select%20*%20from%20employee%20where%20name%20%3C%3E%20';
         LOGGER.info("Searching for employee with name: {}", employeename);
-        entityManager.createQuery("SELECT e from Employee e where e.name = '" + employeename + "'").getResultList();
+        System.out.print("employeename: " + employeename);
+        String query = "SELECT * from employee where name = '" + employeename + "'";
+        System.out.print("query: " + query);
+        System.out.print(entityManager.createNativeQuery(query).getResultList());
         return "Searched for employee: " + employeename;
     }
 
